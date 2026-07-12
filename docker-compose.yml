@@ -1,0 +1,31 @@
+services:
+  minio:
+    image: minio/minio
+    entrypoint: sh
+    command: > 
+      -c 'mkdir -p /data/gaming-addiction-bucket
+      && minio server /data'
+    ports: 
+      - 9000:9000
+      - 9001:9001
+    environment:
+      MINIO_ROOT_USER: 'minioadmin'
+      MINIO_ROOT_PASSWORD: 'minioadmin'
+      MINIO_ADDRESS: ':9000'
+      MINIO_CONSOLE_ADDRESS: ':9001'
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: de_postgres
+    ports:
+      - "5439:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: gamer_db
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: de_clickhouse
+    ports:
+      - "8123:8123"
