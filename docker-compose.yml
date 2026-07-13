@@ -3,7 +3,7 @@ services:
     image: minio/minio
     entrypoint: sh
     command: > 
-      -c 'mkdir -p /data/gaming-addiction-bucket
+      -c 'mkdir -p /data/universal-bucket
       && minio server /data'
     ports: 
       - 9000:9000
@@ -29,3 +29,16 @@ services:
     container_name: de_clickhouse
     ports:
       - "8123:8123"
+    environment:
+      - CLICKHOUSE_USER=default
+      - CLICKHOUSE_PASSWORD=
+      - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
+  
+  grafana:
+    image: grafana/grafana-enterprise
+    container_name: de_grafana
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    environment:
+      - GF_INSTALL_PLUGINS=grafana-clickhouse-datasource

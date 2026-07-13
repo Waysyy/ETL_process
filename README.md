@@ -1,2 +1,55 @@
-# Gaming-Addiction-and-Mental-Health-Analysis
-An end-to-end data pipeline that ingests gaming and mental health data into a MinIO Data Lake, orchestrates ETL/ELT workflows via Apache Airflow and dbt, and loads it into ClickHouse for BI analytics.
+# ETL_process
+
+## Проект реализует цикл ETL:
+1. Извлекает данные из MinIO
+2. Обрабатывает данные с помощью общего алгоритма:
+    * Вычисляет пороговые значения для числовых данных
+    * Определяет возможные выбросы в строковых данных
+    * Очищает датасет от дубликатов строк
+    * Приводит в норму (путем вычисления среднего значения) аномальные числовые значения
+    * Заполняет пропуски числовых значений средним
+    * Выявляет аномальные даты, заменяет их на None
+3. Загружает обработанный датасет в ClickHouse
+
+## Архитектура:
+
+1. **MinIO:** Объектное хранилище для сбора сырых файлов
+2. **PySpark:** Фреймворк для распределенной обработки и анализа больших данных с использованием Python API
+3. **ClickHouse:** Колоночная OLAP-СУБД
+4. **Grafana:** Платформа для визуализации данных
+
+---
+
+## Технологический стек
+* **Язык разработки:** Python
+* **Инфраструктура:** Docker, Docker Compose
+* **Хранение и СУБД:** MinIO, ClickHouse
+* **Визуализация:** Grafana
+
+---
+
+## Результат визуализации (Дашборд в Grafana)
+
+![Аналитический дашборд](./scr/data_processing/assets/grafana_dashboard.png)
+
+*Ссылка на датасет: https://www.kaggle.com/datasets/dreamtensor/gaming-addiction-and-mental-health-analysis*
+
+---
+
+## Как запустить проект локально
+
+### 1. Подготовка окружения
+Клонируйте репозиторий и поднимите инфраструктуру в Docker:
+```bash
+git clone [https://github.com/Waysyy/ETL_process.git](https://github.com/Waysyy/ETL_process.git)
+cd ETL_process
+docker-compose up -d
+```
+Скачайте любой датасет в формате *.csv* и загрузите его в MinIO или папку *raw_csv* в корне проекта.
+
+### 2. Запуск
+Для выполнения пайплана запустите файл *data_processing.py*
+
+```bash
+python scr/data_processing/data_processing.py
+```
