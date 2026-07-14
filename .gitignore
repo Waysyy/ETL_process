@@ -1,3 +1,6 @@
 scr/data_processing/downloads/gaming_addiction.csv
 scr/data_processing/hadoop/bin/winutils.exe
 scr/data_processing/hadoop/bin/hadoop.dll
+*.csv
+*.xml
+*.iml

@@ -32,21 +32,27 @@
 
 ![Аналитический дашборд](./scr/data_processing/assets/grafana_dashboard.png)
 
-*Ссылка на датасет: https://www.kaggle.com/datasets/dreamtensor/gaming-addiction-and-mental-health-analysis*
+*Ссылка на датасет: https://www.kaggle.com/datasets/priyamchoksi/100000-diabetes-clinical-dataset*
 
 ---
 
 ## Как запустить проект локально
 
 ### 1. Подготовка окружения
-Клонируйте репозиторий и поднимите инфраструктуру в Docker:
+- Клонируйте репозиторий и поднимите инфраструктуру в Docker:
 ```bash
 git clone [https://github.com/Waysyy/ETL_process.git](https://github.com/Waysyy/ETL_process.git)
 cd ETL_process
 docker-compose up -d
 ```
-Скачайте любой датасет в формате *.csv* и загрузите его в MinIO или папку *raw_csv* в корне проекта.
+- Скачайте любой датасет в формате *.csv* и загрузите его в MinIO или папку *raw_csv* в корне проекта.
 
+- Создайте необходимую таблицу в ClickHouse (скрипт для создания таблицы из примера находится в *scr\SQL_scripts*)
+
+- Перед запуском установите необходимое название базы данных
+```Python
+.option("dbtable", "название") \
+```
 ### 2. Запуск
 Для выполнения пайплана запустите файл *data_processing.py*
 
