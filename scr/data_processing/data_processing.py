@@ -133,15 +133,19 @@ class ProcessingAndLoadingBySpark:
             print(f"Размер датасета до очистки: {df.count()}")
             numeric_col = self.find_numeric(df)
             threshold_list_numeric, string_emissions = self.check_values_from_df(df, numeric_col)
-            # string_emissions лучше анализировать и подгонять под конкретный датасет, пока не использую
+            # string_emissions лучше анализировать и подгонять под конкретный датасет
             date_col = [c for c, dtype in df.dtypes if (dtype in ['date', 'timestamp']) or ('date' in c)]
             clear_df = df.dropDuplicates()
+            # print(f"Возможные строковые аномалии {string_emissions}")
 
             for c in clear_df.columns:
                 if c in numeric_col:
-                    threshold_min, threshold_max = next(
-                        ((th.get('threshold_min'), th.get('threshold_max')) for th in threshold_list_numeric
-                         if th.get('column_name') == c), (None, None))
+                    if 'age' in c:
+                        threshold_min, threshold_max = 0.01, 115 # особые пороги для age
+                    else:
+                        threshold_min, threshold_max = next(
+                            ((th.get('threshold_min'), th.get('threshold_max')) for th in threshold_list_numeric
+                             if th.get('column_name') == c), (None, None))
                     if threshold_min and threshold_max:
                         clear_df = clear_df.withColumn(c, when(
                             ((col(c).try_cast('double') <= threshold_min) | (col(c).try_cast('double') >= threshold_max)),
@@ -155,9 +159,11 @@ class ProcessingAndLoadingBySpark:
                     clear_df = clear_df.withColumn(c, when((col(c) > current_date()), None).otherwise(col(c)))
                 else:
                     clear_df = clear_df.withColumn(c, trim(col(c)))
-            clear_df.show()
+            # clear_df.show()
+
             avg_row = clear_df.select([sf.avg(c).alias(c) for c in numeric_col]).first()
             avg_dict = avg_row.asDict() if avg_row else {}
+
             clear_df = clear_df.fillna(avg_dict)
 
             print(f"Размер датасета после очистки: {clear_df.count()}")
@@ -208,7 +214,9 @@ class ProcessingAndLoadingBySpark:
             numeric_col = []
             number_regex = r"^-?[0-9]*\.?[0-9]+$"
             for c, dtype in df.dtypes:
-                if not (c.lower() == 'id' or c.lower().endswith('_id')):
+                # if not (c.lower() == 'id' or c.lower().endswith('_id')):
+                # для датасета Diabetes
+                if 'age' in c or 'year' in c or 'hbA1c_level' in c or 'blood_glucose_level' in c:
                     if dtype in ['int', 'bigint', 'float', 'double']:
                         numeric_col.append(c)
                     if dtype == 'string':
